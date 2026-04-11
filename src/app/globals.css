@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0d1117;
+  --foreground: #d2d4d8;
+  --lbx-green: #00e054;
+  --lbx-green-dark: #00b344;
+  --lbx-orange: #ee7000;
+  --lbx-blue: #40bcf4;
+  --lbx-surface: #161b22;
+  --lbx-surface-light: #1c2128;
+  --lbx-border: #21262d;
+  --lbx-muted: #8b949e;
+  --lbx-body: #6e7681;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-lbx-green: var(--lbx-green);
+  --color-lbx-green-dark: var(--lbx-green-dark);
+  --color-lbx-orange: var(--lbx-orange);
+  --color-lbx-blue: var(--lbx-blue);
+  --color-lbx-surface: var(--lbx-surface);
+  --color-lbx-surface-light: var(--lbx-surface-light);
+  --color-lbx-border: var(--lbx-border);
+  --color-lbx-muted: var(--lbx-muted);
+  --color-lbx-body: var(--lbx-body);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-lora);
+  --animate-shake: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+  --animate-slide-in: slide-in 0.2s ease-out;
+  --animate-fade-in: fade-in 0.3s ease-out;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+::selection {
+  background: rgba(0, 224, 84, 0.2);
+  color: #fff;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--lbx-border); }
