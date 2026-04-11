@@ -63,6 +63,86 @@ export async function getTodaysPuzzle() {
   };
 }
 
+export async function getPuzzleByNumber(puzzleNumber: number) {
+  const { data: puzzle, error } = await supabase
+    .from("daily_puzzles")
+    .select(
+      `
+      id,
+      puzzle_date,
+      puzzle_number,
+      movie:movies (
+        id,
+        tmdb_id,
+        title,
+        year,
+        poster_url,
+        backdrop_url,
+        difficulty,
+        par,
+        director,
+        genres,
+        runtime_minutes
+      )
+    `
+    )
+    .eq("puzzle_number", puzzleNumber)
+    .single();
+
+  if (error || !puzzle) return null;
+
+  const movie = puzzle.movie as unknown as {
+    id: string;
+    tmdb_id: number;
+    title: string;
+    year: number | null;
+    poster_url: string | null;
+    backdrop_url: string | null;
+    difficulty: string;
+    par: number;
+    director: string | null;
+    genres: string[] | null;
+    runtime_minutes: number | null;
+  };
+
+  const { data: reviews } = await supabase
+    .from("reviews")
+    .select("id, review_text, display_order, stars, likes, liked, review_date, reviewer_name, reviewer_avatar_url, reviewer_profile_url, letterboxd_url")
+    .eq("movie_id", movie.id)
+    .order("display_order", { ascending: true });
+
+  return {
+    puzzleId: puzzle.id,
+    puzzleNumber: puzzle.puzzle_number as number,
+    puzzleDate: puzzle.puzzle_date as string,
+    movie,
+    reviews: reviews || [],
+  };
+}
+
+export async function getLatestPuzzleNumber() {
+  const today = new Date().toISOString().split("T")[0];
+  const { data } = await supabase
+    .from("daily_puzzles")
+    .select("puzzle_number")
+    .lte("puzzle_date", today)
+    .order("puzzle_date", { ascending: false })
+    .limit(1)
+    .single();
+
+  return (data?.puzzle_number as number) || null;
+}
+
+export async function getTotalPuzzleCount() {
+  const today = new Date().toISOString().split("T")[0];
+  const { count } = await supabase
+    .from("daily_puzzles")
+    .select("id", { count: "exact", head: true })
+    .lte("puzzle_date", today);
+
+  return count || 0;
+}
+
 export async function getMovieByPuzzleId(puzzleId: string) {
   const { data: puzzle } = await supabase
     .from("daily_puzzles")

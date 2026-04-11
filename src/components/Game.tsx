@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import type { DailyResponse, Guess, GuessResponse } from "@/types";
+import type { DailyResponse, Guess, GuessResponse, ReviewClue } from "@/types";
 import {
   loadGameState,
   saveGameState,
@@ -13,11 +13,13 @@ import ReviewCard from "./ReviewCard";
 import GuessInput from "./GuessInput";
 import ScoreCard from "./ScoreCard";
 
-export default function Game() {
+interface GameProps {
+  puzzleNumber: number;
+}
+
+export default function Game({ puzzleNumber }: GameProps) {
   const [puzzle, setPuzzle] = useState<DailyResponse | null>(null);
-  const [gameState, setGameState] = useState<ReturnType<typeof loadGameState>>(
-    null
-  );
+  const [gameState, setGameState] = useState<ReturnType<typeof loadGameState>>(null);
   const [answer, setAnswer] = useState<{
     title: string;
     year: number | null;
@@ -31,10 +33,16 @@ export default function Game() {
 
   useEffect(() => {
     async function fetchPuzzle() {
+      setLoading(true);
+      setError(null);
+      setPuzzle(null);
+      setGameState(null);
+      setAnswer(null);
+
       try {
-        const res = await fetch("/api/daily");
-        if (!res.ok) throw new Error("failed to fetch puzzle");
-        const data: DailyResponse = await res.json();
+        const res = await fetch(`/api/puzzle/${puzzleNumber}`);
+        if (!res.ok) throw new Error("puzzle not found");
+        const data = await res.json();
         setPuzzle(data);
 
         const saved = loadGameState();
@@ -66,13 +74,13 @@ export default function Game() {
           saveGameState(initial);
         }
       } catch {
-        setError("couldn't load today's puzzle.");
+        setError("puzzle not found");
       } finally {
         setLoading(false);
       }
     }
     fetchPuzzle();
-  }, []);
+  }, [puzzleNumber]);
 
   const handleGuess = useCallback(
     async (tmdbId: number, title: string) => {
@@ -86,11 +94,7 @@ export default function Game() {
         });
         const data: GuessResponse = await res.json();
 
-        const guess: Guess = {
-          tmdb_id: tmdbId,
-          title,
-          correct: data.correct,
-        };
+        const guess: Guess = { tmdb_id: tmdbId, title, correct: data.correct };
         const newState = processGuess(gameState, guess, puzzle.totalReviews);
         setGameState(newState);
         saveGameState(newState);
@@ -121,9 +125,7 @@ export default function Game() {
   if (loading) {
     return (
       <div className="flex flex-1 items-center justify-center py-20">
-        <div className="text-lbx-body text-xs tracking-wide animate-pulse">
-          loading
-        </div>
+        <div className="text-lbx-body text-xs tracking-wide animate-pulse">loading</div>
       </div>
     );
   }
@@ -136,28 +138,25 @@ export default function Game() {
     );
   }
 
-  const visibleReviews = puzzle.reviews.slice(
-    0,
-    gameState.currentReviewIndex + 1
-  );
+  const visibleReviews = puzzle.reviews.slice(0, gameState.currentReviewIndex + 1);
   const isGameOver = gameState.status !== "playing";
 
-  return (
-    <div className="flex flex-col gap-6 w-full">
-      <div className="flex items-center justify-between">
-        <ParBadge difficulty={puzzle.difficulty} par={puzzle.par} />
-        <span className="text-[10px] text-lbx-body tracking-[0.15em] font-mono">
-          #{String(puzzle.puzzleNumber).padStart(3, "0")}
-        </span>
-      </div>
+  // hide dates during play, show after game over
+  const displayReviews: ReviewClue[] = isGameOver
+    ? visibleReviews
+    : visibleReviews.map((r) => ({ ...r, review_date: null }));
 
-      <div className="flex flex-col gap-1">
-        {visibleReviews.map((review, i) => (
+  return (
+    <div className="flex flex-col gap-4 w-full">
+      <ParBadge difficulty={puzzle.difficulty} par={puzzle.par} />
+
+      <div className="flex flex-col gap-0">
+        {displayReviews.map((review, i) => (
           <ReviewCard
             key={i}
             review={review}
             reviewNumber={i + 1}
-            isLatest={i === visibleReviews.length - 1 && !isGameOver}
+            isLatest={i === displayReviews.length - 1 && !isGameOver}
           />
         ))}
       </div>
@@ -188,7 +187,7 @@ export default function Game() {
           guesses={gameState.guesses}
           totalReviews={puzzle.totalReviews}
           par={puzzle.par}
-          puzzleNumber={puzzle.puzzleNumber}
+          puzzleNumber={puzzleNumber}
           answer={answer}
         />
       )}
