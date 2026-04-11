@@ -142,10 +142,14 @@ export default function Game({ puzzleNumber }: GameProps) {
   const visibleReviews = puzzle.reviews.slice(0, gameState.currentReviewIndex + 1);
   const isGameOver = gameState.status !== "playing";
 
-  // hide dates during play, show after game over
+  // during play: only show revealed reviews, hide dates
+  // after game over: show ALL reviews, with unseen ones grayed out
+  const allReviews = puzzle.reviews;
+  const seenCount = gameState.currentReviewIndex + 1;
+
   const displayReviews: ReviewClue[] = isGameOver
-    ? visibleReviews
-    : visibleReviews.map((r) => ({ ...r, review_date: null }));
+    ? allReviews
+    : allReviews.slice(0, seenCount).map((r) => ({ ...r, review_date: null }));
 
   return (
     <div className="flex flex-col gap-4 w-full">
@@ -160,7 +164,8 @@ export default function Game({ puzzleNumber }: GameProps) {
             key={i}
             review={review}
             reviewNumber={i + 1}
-            isLatest={i === displayReviews.length - 1 && !isGameOver}
+            isLatest={i === seenCount - 1 && !isGameOver}
+            unseen={isGameOver && i >= seenCount}
           />
         ))}
       </div>

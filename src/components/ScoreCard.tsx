@@ -29,6 +29,7 @@ export default function ScoreCard({
 }: ScoreCardProps) {
   const [copied, setCopied] = useState(false);
   const [streak, setStreak] = useState({ current: 0, max: 0 });
+  const [open, setOpen] = useState(true);
 
   useEffect(() => {
     const s = updateStreak(status === "won");
@@ -55,66 +56,102 @@ export default function ScoreCard({
     }
   }
 
-  return (
-    <div className="animate-fade-in border-t border-lbx-border pt-6 mt-2">
-      {answer && (
-        <div className="flex gap-5">
-          {answer.poster_url && (
-            <img
-              src={`https://image.tmdb.org/t/p/w300${answer.poster_url}`}
-              alt={answer.title}
-              className="h-52 w-auto shrink-0 shadow-lg shadow-black/40"
-            />
-          )}
-          <div className="flex flex-col justify-between py-1">
-            <div>
-              <div className="text-lg font-semibold text-foreground leading-tight">
-                {answer.title}
-              </div>
-              <div className="flex items-center gap-2 mt-1 text-xs text-lbx-body">
-                {answer.year && <span>{answer.year}</span>}
-                {answer.director && (
-                  <>
-                    <span className="text-lbx-border">/</span>
-                    <span>{answer.director}</span>
-                  </>
-                )}
-              </div>
-              {answer.genres && answer.genres.length > 0 && (
-                <div className="mt-2 text-[11px] text-lbx-muted">
-                  {answer.genres.join(" / ")}
-                </div>
-              )}
-              <div className="mt-4 text-sm">
-                {won ? (
-                  <div>
-                    <span className="text-lbx-green font-medium">{scoreLabel}</span>
-                    <span className="text-lbx-body ml-2 text-xs">
-                      {guesses.length}/{totalReviews} &middot; par {par}
-                    </span>
-                  </div>
-                ) : (
-                  <span className="text-lbx-body text-xs">
-                    {totalReviews}/{totalReviews} &middot; par {par}
-                  </span>
-                )}
-              </div>
-            </div>
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="text-[10px] uppercase tracking-wider text-lbx-body hover:text-foreground transition-colors self-center mt-2"
+      >
+        results
+      </button>
+    );
+  }
 
-            <div className="flex items-center gap-4 mt-4">
-              <button
-                onClick={handleShare}
-                className="border border-lbx-green text-lbx-green px-4 py-1.5 text-[11px] uppercase tracking-[0.1em] font-semibold transition-all hover:bg-lbx-green hover:text-background active:scale-[0.97]"
-              >
-                {copied ? "copied" : "share"}
-              </button>
-              <div className="text-[10px] text-lbx-body tracking-wide">
-                streak {streak.current} &middot; best {streak.max}
+  return (
+    <>
+      <div
+        className="fixed inset-0 bg-background/80 z-40 animate-fade-in"
+        onClick={() => setOpen(false)}
+      />
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+        <div
+          className="bg-lbx-surface border border-lbx-border w-full max-w-[280px] relative"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* close */}
+          <button
+            onClick={() => setOpen(false)}
+            className="absolute top-2.5 right-3 text-lbx-body hover:text-foreground text-xs transition-colors"
+          >
+            &times;
+          </button>
+
+          {answer && (
+            <>
+              {/* poster — full width, no padding */}
+              {answer.poster_url && (
+                <img
+                  src={`https://image.tmdb.org/t/p/w400${answer.poster_url}`}
+                  alt={answer.title}
+                  className="w-full border-b border-lbx-border"
+                />
+              )}
+
+              {/* info */}
+              <div className="p-4 flex flex-col gap-2.5">
+                <div>
+                  <div className="text-sm font-semibold text-foreground leading-tight">
+                    {answer.title}
+                  </div>
+                  <div className="flex items-center gap-2 mt-0.5 text-[11px] text-lbx-body">
+                    {answer.year && <span>{answer.year}</span>}
+                    {answer.director && (
+                      <>
+                        <span className="text-lbx-border">/</span>
+                        <span>{answer.director}</span>
+                      </>
+                    )}
+                  </div>
+                  {answer.genres && answer.genres.length > 0 && (
+                    <div className="mt-1 text-[10px] text-lbx-muted">
+                      {answer.genres.join(" / ")}
+                    </div>
+                  )}
+                </div>
+
+                {/* score */}
+                <div className="border-t border-lbx-border pt-3 text-sm">
+                  {won ? (
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-lbx-green font-semibold text-sm">{scoreLabel}</span>
+                      <span className="text-lbx-body text-[11px]">
+                        {guesses.length}/{totalReviews} &middot; par {par}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-lbx-body text-[11px]">
+                      {totalReviews}/{totalReviews} &middot; par {par}
+                    </span>
+                  )}
+                </div>
+
+                {/* actions */}
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={handleShare}
+                    className="border border-lbx-green text-lbx-green px-5 py-1.5 text-[10px] uppercase tracking-[0.12em] font-semibold transition-all hover:bg-lbx-green hover:text-background active:scale-[0.97]"
+                  >
+                    {copied ? "copied" : "share"}
+                  </button>
+                  <div className="text-[10px] text-lbx-body tracking-wide">
+                    streak {streak.current} &middot; best {streak.max}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 }

@@ -6,6 +6,7 @@ interface ReviewCardProps {
   review: ReviewClue;
   reviewNumber: number;
   isLatest: boolean;
+  unseen?: boolean;
 }
 
 function starsDisplay(stars: number): string {
@@ -14,9 +15,9 @@ function starsDisplay(stars: number): string {
   return "\u2605".repeat(full) + (half ? "\u00BD" : "");
 }
 
-export default function ReviewCard({ review, reviewNumber, isLatest }: ReviewCardProps) {
+export default function ReviewCard({ review, reviewNumber, isLatest, unseen }: ReviewCardProps) {
   return (
-    <div className="animate-slide-in border-t border-lbx-border pt-3 pb-2">
+    <div className={`animate-slide-in border-t border-lbx-border pt-3 pb-2 ${unseen ? "opacity-35" : ""}`}>
       <div className="flex gap-2.5">
         {/* avatar */}
         {review.reviewer_avatar_url ? (
