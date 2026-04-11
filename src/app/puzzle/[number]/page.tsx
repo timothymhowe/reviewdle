@@ -31,7 +31,7 @@ export default async function PuzzlePage({
             </svg>
             reviewdle
           </h1>
-          <PuzzleNav puzzleNumber={puzzleNumber} />
+          <span />
         </div>
       </header>
       <main className="flex-1 w-full max-w-xl mx-auto px-5 py-6">

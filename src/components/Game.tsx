@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import type { DailyResponse, Guess, GuessResponse, ReviewClue } from "@/types";
+import PuzzleNav from "./PuzzleNav";
 import {
   loadGameState,
   saveGameState,
@@ -148,7 +149,10 @@ export default function Game({ puzzleNumber }: GameProps) {
 
   return (
     <div className="flex flex-col gap-4 w-full">
-      <ParBadge difficulty={puzzle.difficulty} par={puzzle.par} />
+      <div className="flex items-center gap-4">
+        <PuzzleNav puzzleNumber={puzzleNumber} />
+        <ParBadge difficulty={puzzle.difficulty} par={puzzle.par} />
+      </div>
 
       <div className="flex flex-col gap-0">
         {displayReviews.map((review, i) => (
