@@ -14,7 +14,9 @@ export default function GuessInput({ onGuess, disabled }: GuessInputProps) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const [dropUp, setDropUp] = useState(false);
 
   const fetchResults = useCallback(async (q: string) => {
     if (q.length < 2) {
@@ -27,6 +29,12 @@ export default function GuessInput({ onGuess, disabled }: GuessInputProps) {
       setResults(data);
       setShowDropdown(data.length > 0);
       setSelectedIndex(-1);
+      // check if dropdown should go up
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - rect.bottom;
+        setDropUp(spaceBelow < 300);
+      }
     } catch {
       setResults([]);
     }
@@ -63,7 +71,7 @@ export default function GuessInput({ onGuess, disabled }: GuessInputProps) {
   }
 
   return (
-    <div className="relative w-full">
+    <div ref={containerRef} className="relative w-full">
       <input
         ref={inputRef}
         type="text"
@@ -77,7 +85,7 @@ export default function GuessInput({ onGuess, disabled }: GuessInputProps) {
         className="w-full border-b border-lbx-border bg-transparent px-0 py-3 text-base text-foreground placeholder-lbx-body/40 outline-none transition-colors focus:border-lbx-green disabled:opacity-20 disabled:cursor-not-allowed"
       />
       {showDropdown && (
-        <ul className="absolute z-10 bottom-full mb-0 max-h-72 w-full overflow-auto border border-lbx-border bg-lbx-surface shadow-2xl shadow-black/50">
+        <ul className={`absolute z-10 max-h-72 w-full overflow-auto border border-lbx-border bg-lbx-surface shadow-2xl shadow-black/50 ${dropUp ? "bottom-full mb-0" : "top-full mt-0"}`}>
           {results.map((result, i) => {
             const year = result.release_date?.split("-")[0] || "";
             return (
