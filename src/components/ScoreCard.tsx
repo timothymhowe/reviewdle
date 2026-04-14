@@ -46,48 +46,36 @@ function ResultContent({
 }) {
   return (
     <>
-      <div className="border-t border-lbx-border pt-3 px-4 mt-0">
+      <div className="py-1.5 px-4 text-center">
         {won ? (
-          <div className="text-sm font-bold text-lbx-green uppercase tracking-wide">you got it</div>
+          <div className="text-lg font-bold text-white">you got it!</div>
         ) : (
-          <div className="text-sm font-bold text-lbx-orange uppercase tracking-wide">not this time</div>
+          <div className="text-lg font-bold text-white">better luck next time</div>
         )}
       </div>
       {answer.poster_url && (
         <img
           src={`https://image.tmdb.org/t/p/w400${answer.poster_url}`}
           alt={answer.title}
-          className="w-full max-h-64 object-contain border-b border-lbx-border bg-black/20"
+          className="w-full border-b border-lbx-border"
         />
       )}
       <div className="p-4 flex flex-col gap-2.5">
         <div>
           <div className="text-sm font-semibold text-foreground leading-tight">
-            {answer.title}
+            {answer.title}{answer.year && <span className="font-normal text-lbx-muted ml-1">({answer.year})</span>}
           </div>
-          <div className="flex items-center gap-2 mt-0.5 text-[11px] text-lbx-body">
-            {answer.year && <span>{answer.year}</span>}
-            {answer.director && (
-              <>
-                <span className="text-lbx-border">/</span>
-                <span>{answer.director}</span>
-              </>
-            )}
-          </div>
-          {answer.cast_members && answer.cast_members.length > 0 && (
-            <div className="mt-1 text-[10px] text-lbx-muted">
-              {answer.cast_members.join(", ")}
-            </div>
-          )}
           {answer.genres && answer.genres.length > 0 && (
-            <div className="mt-0.5 text-[10px] text-lbx-body">
-              {answer.genres.join(" / ")}
-            </div>
+            <div className="text-[10px] text-lbx-muted">{answer.genres.join(" / ")}</div>
+          )}
+          {answer.director && (
+            <div className="text-[10px] text-foreground/70">{answer.director}</div>
+          )}
+          {answer.cast_members && answer.cast_members.length > 0 && (
+            <div className="text-[10px] text-foreground/50">{answer.cast_members.join(", ")}</div>
           )}
           {answer.studio && (
-            <div className="mt-0.5 text-[10px] text-lbx-body/60">
-              {answer.studio}
-            </div>
+            <div className="text-[10px] text-lbx-muted/60">{answer.studio}</div>
           )}
           {answer.letterboxd_url && (
             <a
@@ -225,7 +213,7 @@ export default function ScoreCard({
           />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
             <div
-              className="bg-lbx-surface border border-lbx-border w-full max-w-[280px] relative"
+              className="bg-lbx-surface border border-lbx-border w-full max-w-[240px] relative"
               onClick={(e) => e.stopPropagation()}
             >
               <button
