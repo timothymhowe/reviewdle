@@ -164,6 +164,18 @@ export default function Game({ puzzleNumber }: GameProps) {
         <ParBadge difficulty={puzzle.difficulty} par={puzzle.par} />
       </div>
 
+      {isGameOver && (
+        <ScoreCard
+          status={gameState.status}
+          guesses={gameState.guesses}
+          totalReviews={puzzle.totalReviews}
+          par={puzzle.par}
+          puzzleNumber={puzzleNumber}
+          answer={answer}
+          freshResult={freshResult}
+        />
+      )}
+
       <div className="flex flex-col gap-0">
         {displayReviews.map((review, i) => (
           <ReviewCard
@@ -197,17 +209,6 @@ export default function Game({ puzzleNumber }: GameProps) {
         </div>
       )}
 
-      {isGameOver && (
-        <ScoreCard
-          status={gameState.status}
-          guesses={gameState.guesses}
-          totalReviews={puzzle.totalReviews}
-          par={puzzle.par}
-          puzzleNumber={puzzleNumber}
-          answer={answer}
-          freshResult={freshResult}
-        />
-      )}
     </div>
   );
 }

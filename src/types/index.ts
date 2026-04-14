@@ -22,6 +22,7 @@ export interface Movie {
   par: number;
   vote_count: number | null;
   director: string | null;
+  cast_members: string[] | null;
   genres: string[] | null;
   runtime_minutes: number | null;
   tagline: string | null;

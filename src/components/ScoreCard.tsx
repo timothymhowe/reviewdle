@@ -44,11 +44,18 @@ function ResultContent({
 }) {
   return (
     <>
+      <div className="border-t border-lbx-border pt-3 px-4 mt-0">
+        {won ? (
+          <div className="text-sm font-bold text-lbx-green uppercase tracking-wide">you got it</div>
+        ) : (
+          <div className="text-sm font-bold text-lbx-orange uppercase tracking-wide">not this time</div>
+        )}
+      </div>
       {answer.poster_url && (
         <img
           src={`https://image.tmdb.org/t/p/w400${answer.poster_url}`}
           alt={answer.title}
-          className="w-full border-b border-lbx-border"
+          className="w-full max-h-64 object-contain border-b border-lbx-border bg-black/20"
         />
       )}
       <div className="p-4 flex flex-col gap-2.5">
@@ -83,24 +90,18 @@ function ResultContent({
         </div>
         <div className="border-t border-lbx-border pt-3">
           {won ? (
-            <div>
-              <div className="text-sm font-bold text-lbx-green uppercase tracking-wide">you got it</div>
-              <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-lbx-green font-semibold text-sm">{scoreLabel}</span>
-                <span className="text-lbx-body text-[11px]">
-                  {guesses.length}/{totalReviews} &middot; par {par} &middot; {getScoreToPar(guesses.length, par)}
-                </span>
-              </div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-lbx-green font-semibold text-sm">{scoreLabel}</span>
+              <span className="text-lbx-body text-[11px]">
+                {guesses.length}/{totalReviews} &middot; par {par} &middot; {getScoreToPar(guesses.length, par)}
+              </span>
             </div>
           ) : (
-            <div>
-              <div className="text-sm font-bold text-lbx-orange uppercase tracking-wide">not this time</div>
-              <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-red-400 font-semibold text-sm">{getScoreLabel(totalReviews + 1, par)}</span>
-                <span className="text-lbx-body text-[11px]">
-                  {totalReviews}/{totalReviews} &middot; par {par} &middot; {getScoreToPar(totalReviews + 1, par)}
-                </span>
-              </div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-red-400 font-semibold text-sm">{getScoreLabel(totalReviews + 1, par)}</span>
+              <span className="text-lbx-body text-[11px]">
+                {totalReviews}/{totalReviews} &middot; par {par} &middot; {getScoreToPar(totalReviews + 1, par)}
+              </span>
             </div>
           )}
         </div>
@@ -156,20 +157,49 @@ export default function ScoreCard({
 
   return (
     <>
-      {/* inline results — always visible */}
-      <div className="border-t border-lbx-border mt-2">
-        <div className="bg-lbx-surface border border-lbx-border border-t-0 max-w-[280px] mx-auto">
-          <ResultContent
-            answer={answer}
-            won={won}
-            scoreLabel={scoreLabel}
-            guesses={guesses}
-            totalReviews={totalReviews}
-            par={par}
-            streak={streak}
-            copied={copied}
-            onShare={handleShare}
-          />
+      {/* inline results — top banner */}
+      <div className="border-t border-b border-lbx-border bg-lbx-surface -mx-5">
+        <div className="flex items-stretch gap-2.5">
+          {answer.poster_url && (
+            <img
+              src={`https://image.tmdb.org/t/p/w92${answer.poster_url}`}
+              alt={answer.title}
+              className="w-12 object-cover shrink-0"
+            />
+          )}
+          <div className="flex-1 min-w-0 py-2">
+            <div className="text-xs font-semibold text-foreground leading-tight truncate">
+              {answer.title}
+            </div>
+            <div className="flex items-center gap-2 text-[9px] text-lbx-body">
+              {answer.year && <span>{answer.year}</span>}
+              {answer.director && (
+                <>
+                  <span className="text-lbx-border">/</span>
+                  <span>{answer.director}</span>
+                </>
+              )}
+            </div>
+          </div>
+          <div className="shrink-0 text-right flex flex-col items-end gap-1 py-2 pr-5">
+            <div className={`text-[10px] font-bold uppercase tracking-wide ${won ? "text-lbx-green" : "text-lbx-orange"}`}>
+              {won ? "you got it" : "not this time"}
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <span className={`font-semibold text-xs ${won ? "text-lbx-green" : "text-red-400"}`}>
+                {won ? scoreLabel : getScoreLabel(totalReviews + 1, par)}
+              </span>
+              <span className="text-lbx-body text-[10px]">
+                {won ? guesses.length : totalReviews}/{totalReviews} &middot; {getScoreToPar(won ? guesses.length : totalReviews + 1, par)}
+              </span>
+            </div>
+            <button
+              onClick={handleShare}
+              className="border border-lbx-green text-lbx-green px-2.5 py-0.5 text-[9px] uppercase tracking-[0.1em] font-semibold transition-all hover:bg-lbx-green hover:text-background active:scale-[0.97]"
+            >
+              {copied ? "copied" : "share"}
+            </button>
+          </div>
         </div>
       </div>
 

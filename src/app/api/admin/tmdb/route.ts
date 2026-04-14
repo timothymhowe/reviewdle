@@ -18,11 +18,15 @@ export async function GET(request: NextRequest) {
   }
 
   const movie = await movieRes.json();
-  const credits = creditsRes.ok ? await creditsRes.json() : { crew: [] };
+  const credits = creditsRes.ok ? await creditsRes.json() : { crew: [], cast: [] };
 
   const director = credits.crew?.find(
     (c: { job: string; name: string }) => c.job === "Director"
   )?.name || null;
+
+  const cast = (credits.cast || [])
+    .slice(0, 3)
+    .map((c: { name: string }) => c.name);
 
   return NextResponse.json({
     tmdb_id: movie.id,
@@ -32,6 +36,7 @@ export async function GET(request: NextRequest) {
     backdrop_url: movie.backdrop_path,
     vote_count: movie.vote_count,
     director,
+    cast,
     genres: movie.genres?.map((g: { name: string }) => g.name) || [],
     runtime_minutes: movie.runtime,
     tagline: movie.tagline || null,

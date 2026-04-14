@@ -31,6 +31,7 @@ create table movies (
   vote_count integer,
   -- metadata
   director text,
+  cast_members text[],
   genres text[],
   runtime_minutes integer,
   tagline text,

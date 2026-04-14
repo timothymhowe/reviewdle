@@ -21,9 +21,9 @@ export function HowToPlayButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="text-lbx-body hover:text-foreground transition-colors text-sm font-medium"
+        className="px-2.5 py-1 bg-lbx-surface border border-lbx-border text-lbx-muted hover:text-foreground hover:border-lbx-muted hover:bg-lbx-surface-light transition-colors text-[10px] uppercase tracking-wider font-semibold"
       >
-        ?
+        how to play
       </button>
 
       {open && (
