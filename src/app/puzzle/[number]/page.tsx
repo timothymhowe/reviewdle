@@ -1,5 +1,8 @@
+import { redirect } from "next/navigation";
 import Game from "@/components/Game";
 import PuzzleNav from "@/components/PuzzleNav";
+import { HowToPlayButton } from "@/components/HowToPlay";
+import { getLatestPuzzleNumber } from "@/lib/supabase";
 
 export default async function PuzzlePage({
   params,
@@ -8,6 +11,12 @@ export default async function PuzzlePage({
 }) {
   const { number } = await params;
   const puzzleNumber = parseInt(number);
+
+  // if this is today's puzzle, redirect to / for a clean url
+  const latest = await getLatestPuzzleNumber();
+  if (latest && puzzleNumber === latest) {
+    redirect("/");
+  }
 
   return (
     <div className="flex flex-col flex-1 items-center font-sans">
@@ -31,7 +40,7 @@ export default async function PuzzlePage({
             </svg>
             reviewdle
           </a>
-          <span />
+          <HowToPlayButton />
         </div>
       </header>
       <main className="flex-1 w-full max-w-xl mx-auto px-5 py-6">

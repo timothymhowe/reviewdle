@@ -32,6 +32,7 @@ export default function Game({ puzzleNumber }: GameProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [shaking, setShaking] = useState(false);
+  const [freshResult, setFreshResult] = useState(false);
 
   useEffect(() => {
     async function fetchPuzzle() {
@@ -101,7 +102,10 @@ export default function Game({ puzzleNumber }: GameProps) {
         setGameState(newState);
         saveGameState(newState);
 
-        if (data.answer) setAnswer(data.answer);
+        if (data.answer) {
+          setAnswer(data.answer);
+          setFreshResult(true);
+        }
 
         if (!data.correct && newState.status === "playing") {
           setShaking(true);
@@ -115,7 +119,10 @@ export default function Game({ puzzleNumber }: GameProps) {
             body: JSON.stringify({ tmdbId: -1, reveal: true, puzzleId: puzzle.puzzleId }),
           });
           const answerData: GuessResponse = await answerRes.json();
-          if (answerData.answer) setAnswer(answerData.answer);
+          if (answerData.answer) {
+            setAnswer(answerData.answer);
+            setFreshResult(true);
+          }
         }
       } catch {
         setError("something went wrong.");
@@ -143,14 +150,12 @@ export default function Game({ puzzleNumber }: GameProps) {
   const visibleReviews = puzzle.reviews.slice(0, gameState.currentReviewIndex + 1);
   const isGameOver = gameState.status !== "playing";
 
-  // during play: only show revealed reviews, hide dates
-  // after game over: show ALL reviews, with unseen ones grayed out
   const allReviews = puzzle.reviews;
   const seenCount = gameState.currentReviewIndex + 1;
 
   const displayReviews: ReviewClue[] = isGameOver
     ? allReviews
-    : allReviews.slice(0, seenCount).map((r) => ({ ...r, review_date: null }));
+    : allReviews.slice(0, seenCount);
 
   return (
     <div className="flex flex-col gap-4 w-full">
@@ -167,6 +172,7 @@ export default function Game({ puzzleNumber }: GameProps) {
             reviewNumber={i + 1}
             isLatest={i === seenCount - 1 && !isGameOver}
             unseen={isGameOver && i >= seenCount}
+            gameOver={isGameOver}
           />
         ))}
       </div>
@@ -199,6 +205,7 @@ export default function Game({ puzzleNumber }: GameProps) {
           par={puzzle.par}
           puzzleNumber={puzzleNumber}
           answer={answer}
+          freshResult={freshResult}
         />
       )}
     </div>

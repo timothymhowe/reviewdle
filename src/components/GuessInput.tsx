@@ -81,7 +81,7 @@ export default function GuessInput({ onGuess, disabled }: GuessInputProps) {
         onFocus={() => results.length > 0 && setShowDropdown(true)}
         onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
         disabled={disabled}
-        placeholder={disabled ? "" : "title"}
+        placeholder={disabled ? "" : "guess a movie..."}
         className="w-full border-b border-lbx-border bg-transparent px-0 py-3 text-base text-foreground placeholder-lbx-body/40 outline-none transition-colors focus:border-lbx-green disabled:opacity-20 disabled:cursor-not-allowed"
       />
       {showDropdown && (

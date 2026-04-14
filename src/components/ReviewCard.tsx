@@ -7,6 +7,7 @@ interface ReviewCardProps {
   reviewNumber: number;
   isLatest: boolean;
   unseen?: boolean;
+  gameOver?: boolean;
 }
 
 function starsDisplay(stars: number): string {
@@ -15,7 +16,7 @@ function starsDisplay(stars: number): string {
   return "\u2605".repeat(full) + (half ? "\u00BD" : "");
 }
 
-export default function ReviewCard({ review, reviewNumber, isLatest, unseen }: ReviewCardProps) {
+export default function ReviewCard({ review, reviewNumber, isLatest, unseen, gameOver }: ReviewCardProps) {
   return (
     <div className={`animate-slide-in border-t border-lbx-border pt-3 pb-2 ${unseen ? "opacity-35" : ""}`}>
       <div className="flex gap-2.5">
@@ -42,9 +43,9 @@ export default function ReviewCard({ review, reviewNumber, isLatest, unseen }: R
               </svg>
             )}
             <span className="text-lbx-body">watched by</span>
-            {review.letterboxd_url ? (
+            {review.reviewer_profile_url && gameOver ? (
               <a
-                href={review.letterboxd_url}
+                href={review.reviewer_profile_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-semibold text-foreground hover:text-lbx-green transition-colors"
