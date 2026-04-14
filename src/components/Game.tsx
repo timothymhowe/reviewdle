@@ -178,9 +178,9 @@ export default function Game({ puzzleNumber }: GameProps) {
       </div>
 
       {gameState.guesses.length > 0 && !isGameOver && (
-        <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-lbx-body">
+        <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs text-lbx-muted">
           {gameState.guesses.map((guess, i) => (
-            <span key={i} className="line-through decoration-red-500/50">
+            <span key={i} className="line-through decoration-red-500/60">
               {guess.title}
             </span>
           ))}

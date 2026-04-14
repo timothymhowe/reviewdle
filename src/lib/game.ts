@@ -58,13 +58,21 @@ export function processGuess(
 }
 
 export function getScoreLabel(guessCount: number, par: number): string {
+  if (guessCount === 1) return "ace";
   const diff = guessCount - par;
   if (diff <= -2) return "eagle";
   if (diff === -1) return "birdie";
   if (diff === 0) return "par";
   if (diff === 1) return "bogey";
   if (diff === 2) return "double bogey";
-  return "triple bogey+";
+  return "triple bogey";
+}
+
+export function getScoreToPar(guessCount: number, par: number): string {
+  const diff = guessCount - par;
+  if (diff < 0) return `${diff}`;
+  if (diff === 0) return "E";
+  return `+${diff}`;
 }
 
 export function generateShareText(

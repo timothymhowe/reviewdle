@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import type { Guess, GameStatus } from "@/types";
-import { getScoreLabel, generateShareText, updateStreak } from "@/lib/game";
+import { getScoreLabel, getScoreToPar, generateShareText, updateStreak } from "@/lib/game";
 
 interface ScoreCardProps {
   status: GameStatus;
@@ -81,18 +81,27 @@ function ResultContent({
             </a>
           )}
         </div>
-        <div className="border-t border-lbx-border pt-3 text-sm">
+        <div className="border-t border-lbx-border pt-3">
           {won ? (
-            <div className="flex items-baseline gap-2">
-              <span className="text-lbx-green font-semibold text-sm">{scoreLabel}</span>
-              <span className="text-lbx-body text-[11px]">
-                {guesses.length}/{totalReviews} &middot; par {par}
-              </span>
+            <div>
+              <div className="text-sm font-bold text-lbx-green uppercase tracking-wide">you got it</div>
+              <div className="flex items-baseline gap-2 mt-1">
+                <span className="text-lbx-green font-semibold text-sm">{scoreLabel}</span>
+                <span className="text-lbx-body text-[11px]">
+                  {guesses.length}/{totalReviews} &middot; par {par} &middot; {getScoreToPar(guesses.length, par)}
+                </span>
+              </div>
             </div>
           ) : (
-            <span className="text-lbx-body text-[11px]">
-              {totalReviews}/{totalReviews} &middot; par {par}
-            </span>
+            <div>
+              <div className="text-sm font-bold text-lbx-orange uppercase tracking-wide">not this time</div>
+              <div className="flex items-baseline gap-2 mt-1">
+                <span className="text-red-400 font-semibold text-sm">{getScoreLabel(totalReviews + 1, par)}</span>
+                <span className="text-lbx-body text-[11px]">
+                  {totalReviews}/{totalReviews} &middot; par {par} &middot; {getScoreToPar(totalReviews + 1, par)}
+                </span>
+              </div>
+            </div>
           )}
         </div>
         <div className="flex items-center justify-between">

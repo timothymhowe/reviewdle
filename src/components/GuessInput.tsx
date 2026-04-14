@@ -82,7 +82,7 @@ export default function GuessInput({ onGuess, disabled }: GuessInputProps) {
         onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
         disabled={disabled}
         placeholder={disabled ? "" : "guess a movie..."}
-        className="w-full border-b border-lbx-border bg-transparent px-0 py-3 text-base text-foreground placeholder-lbx-body/40 outline-none transition-colors focus:border-lbx-green disabled:opacity-20 disabled:cursor-not-allowed"
+        className="w-full border-b border-lbx-border bg-transparent px-0 py-3 text-base text-foreground placeholder-lbx-body/60 outline-none transition-colors focus:border-lbx-green disabled:opacity-20 disabled:cursor-not-allowed"
       />
       {showDropdown && (
         <ul className={`absolute z-10 max-h-72 w-full overflow-auto border border-lbx-border bg-lbx-surface shadow-2xl shadow-black/50 ${dropUp ? "bottom-full mb-0" : "top-full mt-0"}`}>
