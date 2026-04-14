@@ -65,8 +65,10 @@ export const TEST_PUZZLE: DailyResponse & {
     poster_url: string;
     tmdb_id: number;
     director: string;
-    letterboxd_url: string;
+    cast_members: string[];
     genres: string[];
+    studio: string;
+    letterboxd_url: string;
   };
 } = {
   puzzleId: "test-001",
@@ -81,7 +83,9 @@ export const TEST_PUZZLE: DailyResponse & {
     poster_url: "/3bv6WAp6BSxxYvB5ozKFUYuRA8C.jpg",
     tmdb_id: 115,
     director: "Joel Coen",
+    cast_members: ["Jeff Bridges", "John Goodman", "Julianne Moore"],
     genres: ["Comedy", "Crime"],
+    studio: "Working Title Films",
     letterboxd_url: "https://letterboxd.com/film/the-big-lebowski/",
   },
 };

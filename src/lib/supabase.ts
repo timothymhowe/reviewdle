@@ -155,7 +155,9 @@ export async function getMovieByPuzzleId(puzzleId: string) {
         year,
         poster_url,
         director,
-        genres
+        cast_members,
+        genres,
+        studio
       )
     `
     )
@@ -170,7 +172,9 @@ export async function getMovieByPuzzleId(puzzleId: string) {
     year: number | null;
     poster_url: string | null;
     director: string | null;
+    cast_members: string[] | null;
     genres: string[] | null;
+    studio: string | null;
   };
 
   // get letterboxd movie url from first review

@@ -104,7 +104,9 @@ export interface GuessResponse {
     poster_url: string | null;
     tmdb_id: number;
     director: string | null;
+    cast_members: string[] | null;
     genres: string[] | null;
+    studio: string | null;
     letterboxd_url: string | null;
   };
 }

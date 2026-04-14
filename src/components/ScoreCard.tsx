@@ -15,7 +15,9 @@ interface ScoreCardProps {
     year: number | null;
     poster_url: string | null;
     director: string | null;
+    cast_members: string[] | null;
     genres: string[] | null;
+    studio: string | null;
     letterboxd_url: string | null;
   } | null;
   freshResult?: boolean;
@@ -72,9 +74,19 @@ function ResultContent({
               </>
             )}
           </div>
-          {answer.genres && answer.genres.length > 0 && (
+          {answer.cast_members && answer.cast_members.length > 0 && (
             <div className="mt-1 text-[10px] text-lbx-muted">
+              {answer.cast_members.join(", ")}
+            </div>
+          )}
+          {answer.genres && answer.genres.length > 0 && (
+            <div className="mt-0.5 text-[10px] text-lbx-body">
               {answer.genres.join(" / ")}
+            </div>
+          )}
+          {answer.studio && (
+            <div className="mt-0.5 text-[10px] text-lbx-body/60">
+              {answer.studio}
             </div>
           )}
           {answer.letterboxd_url && (
@@ -157,45 +169,46 @@ export default function ScoreCard({
 
   return (
     <>
-      {/* inline results — top banner */}
-      <div className="border-t border-b border-lbx-border bg-lbx-surface -mx-5">
+      {/* inline results */}
+      <div className="border border-lbx-border bg-lbx-surface">
         <div className="flex items-stretch gap-2.5">
           {answer.poster_url && (
             <img
               src={`https://image.tmdb.org/t/p/w200${answer.poster_url}`}
               alt={answer.title}
-              className="w-10 object-cover shrink-0"
+              className="w-16 shrink-0 self-start"
             />
           )}
           <div className="flex-1 min-w-0 py-2">
-            <div className="text-xs font-semibold text-foreground leading-tight truncate">
-              {answer.title}
+            <div className="text-sm font-semibold text-foreground leading-tight truncate">
+              {answer.title}{answer.year && <span className="font-normal text-lbx-muted ml-1">({answer.year})</span>}
             </div>
-            <div className="flex items-center gap-2 text-[9px] text-lbx-body">
-              {answer.year && <span>{answer.year}</span>}
-              {answer.director && (
-                <>
-                  <span className="text-lbx-border">/</span>
-                  <span>{answer.director}</span>
-                </>
-              )}
-            </div>
+            {answer.genres && answer.genres.length > 0 && (
+              <div className="text-[10px] text-lbx-muted truncate">{answer.genres.join(" / ")}</div>
+            )}
+            {answer.director && (
+              <div className="text-[10px] text-foreground/70">{answer.director}</div>
+            )}
+            {answer.cast_members && answer.cast_members.length > 0 && (
+              <div className="text-[10px] text-foreground/50 truncate">{answer.cast_members.join(", ")}</div>
+            )}
+            {answer.studio && (
+              <div className="text-[10px] text-lbx-muted/60">{answer.studio}</div>
+            )}
           </div>
-          <div className="shrink-0 text-right flex flex-col items-end gap-1 py-2 pr-5">
-            <div className={`text-[10px] font-bold uppercase tracking-wide ${won ? "text-lbx-green" : "text-lbx-orange"}`}>
-              {won ? "you got it" : "not this time"}
+          <div className="shrink-0 flex flex-col items-end justify-center gap-1.5 py-2 pr-3">
+            <div className={`text-[9px] uppercase tracking-wide ${won ? "text-lbx-green" : "text-lbx-orange"}`}>
+              {won ? "you got it!" : "better luck next time"}
             </div>
-            <div className="flex items-baseline gap-1.5">
-              <span className={`font-semibold text-xs ${won ? "text-lbx-green" : "text-red-400"}`}>
-                {won ? scoreLabel : getScoreLabel(totalReviews + 1, par)}
-              </span>
-              <span className="text-lbx-body text-[10px]">
-                {won ? guesses.length : totalReviews}/{totalReviews} &middot; {getScoreToPar(won ? guesses.length : totalReviews + 1, par)}
-              </span>
+            <div className={`text-xs font-bold ${won ? "text-lbx-green" : "text-red-400"}`}>
+              {won ? scoreLabel : getScoreLabel(totalReviews + 1, par)}
+            </div>
+            <div className="text-[9px] text-lbx-body text-right">
+              {won ? guesses.length : totalReviews}/{totalReviews} &middot; par {par}
             </div>
             <button
               onClick={handleShare}
-              className="border border-lbx-green text-lbx-green px-2.5 py-0.5 text-[9px] uppercase tracking-[0.1em] font-semibold transition-all hover:bg-lbx-green hover:text-background active:scale-[0.97]"
+              className="border border-lbx-green text-lbx-green px-2 py-0.5 text-[9px] uppercase tracking-[0.1em] font-semibold transition-all hover:bg-lbx-green hover:text-background active:scale-[0.97]"
             >
               {copied ? "copied" : "share"}
             </button>

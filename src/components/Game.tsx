@@ -26,7 +26,9 @@ export default function Game({ puzzleNumber }: GameProps) {
     year: number | null;
     poster_url: string | null;
     director: string | null;
+    cast_members: string[] | null;
     genres: string[] | null;
+    studio: string | null;
     letterboxd_url: string | null;
   } | null>(null);
   const [loading, setLoading] = useState(true);
