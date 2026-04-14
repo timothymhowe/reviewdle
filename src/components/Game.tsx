@@ -27,6 +27,7 @@ export default function Game({ puzzleNumber }: GameProps) {
     poster_url: string | null;
     director: string | null;
     genres: string[] | null;
+    letterboxd_url: string | null;
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

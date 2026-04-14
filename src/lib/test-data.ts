@@ -65,6 +65,7 @@ export const TEST_PUZZLE: DailyResponse & {
     poster_url: string;
     tmdb_id: number;
     director: string;
+    letterboxd_url: string;
     genres: string[];
   };
 } = {
@@ -81,5 +82,6 @@ export const TEST_PUZZLE: DailyResponse & {
     tmdb_id: 115,
     director: "Joel Coen",
     genres: ["Comedy", "Crime"],
+    letterboxd_url: "https://letterboxd.com/film/the-big-lebowski/",
   },
 };

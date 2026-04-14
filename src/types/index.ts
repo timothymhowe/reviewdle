@@ -103,5 +103,6 @@ export interface GuessResponse {
     tmdb_id: number;
     director: string | null;
     genres: string[] | null;
+    letterboxd_url: string | null;
   };
 }

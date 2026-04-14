@@ -13,7 +13,7 @@ export default async function PuzzlePage({
     <div className="flex flex-col flex-1 items-center font-sans">
       <header className="w-full border-b border-lbx-border">
         <div className="max-w-xl mx-auto px-5 py-4 flex items-baseline justify-between">
-          <h1 className="text-2xl font-bold tracking-tight text-white lowercase font-sans flex items-center gap-2">
+          <a href="/" className="text-2xl font-bold tracking-tight text-white lowercase font-sans flex items-center gap-2 no-underline">
             <svg width="56" height="28" viewBox="0 0 44 22" className="shrink-0">
               <defs>
                 <clipPath id="c1"><rect width="12" height="12" transform="translate(7,11) rotate(-45)" /></clipPath>
@@ -30,7 +30,7 @@ export default async function PuzzlePage({
               </g>
             </svg>
             reviewdle
-          </h1>
+          </a>
           <span />
         </div>
       </header>

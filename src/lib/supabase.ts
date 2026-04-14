@@ -148,6 +148,7 @@ export async function getMovieByPuzzleId(puzzleId: string) {
     .from("daily_puzzles")
     .select(
       `
+      movie_id,
       movie:movies (
         tmdb_id,
         title,
@@ -162,7 +163,8 @@ export async function getMovieByPuzzleId(puzzleId: string) {
     .single();
 
   if (!puzzle) return null;
-  return puzzle.movie as unknown as {
+
+  const movie = puzzle.movie as unknown as {
     tmdb_id: number;
     title: string;
     year: number | null;
@@ -170,6 +172,23 @@ export async function getMovieByPuzzleId(puzzleId: string) {
     director: string | null;
     genres: string[] | null;
   };
+
+  // get letterboxd movie url from first review
+  const { data: review } = await supabase
+    .from("reviews")
+    .select("letterboxd_url")
+    .eq("movie_id", puzzle.movie_id)
+    .not("letterboxd_url", "is", null)
+    .limit(1)
+    .single();
+
+  let letterboxdUrl: string | null = null;
+  if (review?.letterboxd_url) {
+    const match = (review.letterboxd_url as string).match(/\/film\/[^/]+\//);
+    if (match) letterboxdUrl = `https://letterboxd.com${match[0]}`;
+  }
+
+  return { ...movie, letterboxd_url: letterboxdUrl };
 }
 
 export async function upsertAnonymousUser(cookieId: string) {

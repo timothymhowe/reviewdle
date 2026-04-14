@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
     poster_url: string | null;
     director: string | null;
     genres: string[] | null;
+    letterboxd_url: string | null;
   };
 
   if (useSupabase && puzzleId) {

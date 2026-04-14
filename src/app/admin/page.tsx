@@ -14,6 +14,9 @@ interface Movie {
   vote_count: number | null;
   director: string | null;
   genres: string[] | null;
+  review_count: number;
+  schedule: { puzzle_date: string; puzzle_number: number } | null;
+  played: boolean;
 }
 
 interface ReviewRow {
@@ -37,14 +40,35 @@ interface Puzzle {
 
 export default function AdminPage() {
   const [tab, setTab] = useState<"movies" | "reviews" | "schedule">("movies");
+  const [jumpToMovieId, setJumpToMovieId] = useState<string | null>(null);
+
+  function goToReview(movieId: string) {
+    setJumpToMovieId(movieId);
+    setTab("reviews");
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
       <header className="border-b border-lbx-border">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-baseline gap-6">
-          <h1 className="text-base font-semibold tracking-[0.2em] uppercase text-lbx-green">
+        <div className="max-w-4xl mx-auto px-6 py-4 flex items-baseline justify-between">
+          <a href="/" className="text-2xl font-bold tracking-tight text-white lowercase font-sans flex items-center gap-2 no-underline">
+            <svg width="56" height="28" viewBox="0 0 44 22" className="shrink-0">
+              <defs>
+                <clipPath id="c1"><rect width="12" height="12" transform="translate(7,11) rotate(-45)" /></clipPath>
+                <clipPath id="c3"><rect width="12" height="12" transform="translate(25,11) rotate(-45)" /></clipPath>
+              </defs>
+              <rect width="12" height="12" transform="translate(7,11) rotate(-45)" fill="#40bcf4" />
+              <rect width="12" height="12" transform="translate(16,11) rotate(-45)" fill="#00e054" />
+              <rect width="12" height="12" transform="translate(25,11) rotate(-45)" fill="#ee7000" />
+              <g clipPath="url(#c1)">
+                <rect width="12" height="12" transform="translate(16,11) rotate(-45)" fill="white" />
+              </g>
+              <g clipPath="url(#c3)">
+                <rect width="12" height="12" transform="translate(16,11) rotate(-45)" fill="white" />
+              </g>
+            </svg>
             reviewdle
-          </h1>
+          </a>
           <span className="text-[10px] uppercase tracking-[0.15em] text-lbx-body">
             admin
           </span>
@@ -68,8 +92,8 @@ export default function AdminPage() {
           ))}
         </nav>
 
-        {tab === "movies" && <MoviesTab />}
-        {tab === "reviews" && <ReviewsTab />}
+        {tab === "movies" && <MoviesTab onGoToReview={goToReview} />}
+        {tab === "reviews" && <ReviewsTab jumpToMovieId={jumpToMovieId} onJumpHandled={() => setJumpToMovieId(null)} />}
         {tab === "schedule" && <ScheduleTab />}
       </div>
     </div>
@@ -78,12 +102,16 @@ export default function AdminPage() {
 
 // ─── MOVIES TAB ──────────────────────────────────────────────
 
-function MoviesTab() {
+function MoviesTab({ onGoToReview }: { onGoToReview: (movieId: string) => void }) {
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<TMDBSearchResult[]>([]);
   const [movies, setMovies] = useState<Movie[]>([]);
   const [adding, setAdding] = useState(false);
   const [message, setMessage] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState<Movie | null>(null);
+  const [showPlayed, setShowPlayed] = useState(false);
+  const [showUnreviewed, setShowUnreviewed] = useState(true);
+  const [showReviewed, setShowReviewed] = useState(true);
 
   useEffect(() => {
     fetchMovies();
@@ -109,12 +137,10 @@ function MoviesTab() {
     setAdding(true);
     setMessage("");
     try {
-      // fetch full details from tmdb
       const detailRes = await fetch(`/api/admin/tmdb?id=${tmdbId}`);
       if (!detailRes.ok) { setMessage("tmdb lookup failed"); return; }
       const details = await detailRes.json();
 
-      // auto-assign difficulty + par based on vote count
       let difficulty = "hard";
       let par = 5;
       if (details.vote_count >= 10000) { difficulty = "easy"; par = 3; }
@@ -140,6 +166,21 @@ function MoviesTab() {
     }
   }
 
+  // sort: scheduled movies by date first, then unscheduled
+  const sorted = [...movies].sort((a, b) => {
+    if (a.schedule && b.schedule) return a.schedule.puzzle_date.localeCompare(b.schedule.puzzle_date);
+    if (a.schedule) return -1;
+    if (b.schedule) return 1;
+    return a.title.localeCompare(b.title);
+  });
+
+  const filtered = sorted.filter((m) => {
+    if (m.played && !showPlayed) return false;
+    if (m.review_count === 0 && !showUnreviewed) return false;
+    if (m.review_count > 0 && !showReviewed) return false;
+    return true;
+  });
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -164,11 +205,7 @@ function MoviesTab() {
                   className="flex items-center gap-3 px-3 py-2 border-b border-lbx-border/50 last:border-b-0"
                 >
                   {r.poster_path ? (
-                    <img
-                      src={`https://image.tmdb.org/t/p/w92${r.poster_path}`}
-                      alt=""
-                      className="h-12 w-8 object-cover shrink-0"
-                    />
+                    <img src={`https://image.tmdb.org/t/p/w92${r.poster_path}`} alt="" className="h-12 w-8 object-cover shrink-0" />
                   ) : (
                     <div className="h-12 w-8 bg-lbx-border/50 shrink-0" />
                   )}
@@ -192,55 +229,117 @@ function MoviesTab() {
             })}
           </ul>
         )}
-        {message && (
-          <div className="mt-2 text-xs text-lbx-green">{message}</div>
-        )}
+        {message && <div className="mt-2 text-xs text-lbx-green">{message}</div>}
       </div>
 
       <div>
-        <div className="text-[10px] uppercase tracking-[0.15em] text-lbx-body mb-3">
-          movie pool ({movies.length})
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-[10px] uppercase tracking-[0.15em] text-lbx-body">
+            movie pool ({filtered.length}/{movies.length})
+          </div>
+          <div className="flex items-center gap-3">
+            {[
+              { label: "played", state: showPlayed, set: setShowPlayed },
+              { label: "reviewed", state: showReviewed, set: setShowReviewed },
+              { label: "unreviewed", state: showUnreviewed, set: setShowUnreviewed },
+            ].map(({ label, state, set }) => (
+              <button
+                key={label}
+                onClick={() => set(!state)}
+                className={`text-[10px] uppercase tracking-wider transition-colors ${
+                  state ? "text-foreground" : "text-lbx-body/40"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
         <div className="flex flex-col">
-          {movies.map((m) => (
+          {filtered.map((m) => (
             <div
               key={m.id}
-              className="flex items-center gap-3 py-2 border-b border-lbx-border/50"
+              className={`flex items-center gap-3 py-2 border-b border-lbx-border/50 ${m.played ? "opacity-35" : ""}`}
             >
               {m.poster_url ? (
-                <img
-                  src={`https://image.tmdb.org/t/p/w92${m.poster_url}`}
-                  alt=""
-                  className="h-10 w-7 object-cover shrink-0"
-                />
+                <img src={`https://image.tmdb.org/t/p/w92${m.poster_url}`} alt="" className="h-10 w-7 object-cover shrink-0" />
               ) : (
                 <div className="h-10 w-7 bg-lbx-border/50 shrink-0" />
               )}
               <div className="flex-1 min-w-0">
                 <span className="text-sm font-medium">{m.title}</span>
-                {m.year && (
-                  <span className="text-lbx-body text-xs ml-2">{m.year}</span>
-                )}
+                {m.year && <span className="text-lbx-body text-xs ml-2">{m.year}</span>}
               </div>
-              <span className="text-[10px] text-lbx-body">
-                {m.difficulty} / par {m.par}
-              </span>
+              <div className="flex items-center gap-3 text-[10px] text-lbx-body">
+                <button
+                  onClick={() => onGoToReview(m.id)}
+                  className={`hover:text-lbx-green transition-colors ${m.review_count > 0 ? "text-lbx-green" : ""}`}
+                >
+                  {m.review_count}&nbsp;reviews &rarr;
+                </button>
+                {m.schedule ? (
+                  <span className="font-mono">
+                    #{String(m.schedule.puzzle_number).padStart(3, "0")} {m.schedule.puzzle_date}
+                  </span>
+                ) : (
+                  <span className="text-lbx-body/40">unscheduled</span>
+                )}
+                <button
+                  onClick={() => setConfirmDelete(m)}
+                  className="text-lbx-body/40 hover:text-red-500 transition-colors"
+                >
+                  &times;
+                </button>
+              </div>
             </div>
           ))}
-          {movies.length === 0 && (
-            <div className="text-xs text-lbx-body py-4">
-              no movies yet. search tmdb above to add some.
-            </div>
+          {filtered.length === 0 && (
+            <div className="text-xs text-lbx-body py-4">no movies match filters</div>
           )}
         </div>
       </div>
+
+      {/* delete confirm modal */}
+      {confirmDelete && (
+        <>
+          <div className="fixed inset-0 bg-background/80 z-40" onClick={() => setConfirmDelete(null)} />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-lbx-surface border border-lbx-border p-5 max-w-xs w-full flex flex-col gap-4" onClick={(e) => e.stopPropagation()}>
+              <div className="text-sm text-foreground">
+                delete <span className="font-semibold">{confirmDelete.title}</span>?
+              </div>
+              <div className="text-[11px] text-lbx-body">
+                this will also remove its reviews and any scheduled puzzles.
+              </div>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setConfirmDelete(null)}
+                  className="text-[10px] uppercase tracking-wider text-lbx-body hover:text-foreground transition-colors px-3 py-1.5"
+                >
+                  cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    await fetch(`/api/admin/movies/${confirmDelete.id}`, { method: "DELETE" });
+                    setConfirmDelete(null);
+                    fetchMovies();
+                  }}
+                  className="text-[10px] uppercase tracking-wider font-semibold px-4 py-1.5 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
+                >
+                  delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
 
 // ─── REVIEWS TAB ─────────────────────────────────────────────
 
-function ReviewsTab() {
+function ReviewsTab({ jumpToMovieId, onJumpHandled }: { jumpToMovieId: string | null; onJumpHandled: () => void }) {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [reviews, setReviews] = useState<ReviewRow[]>([]);
@@ -253,8 +352,15 @@ function ReviewsTab() {
   useEffect(() => {
     fetch("/api/admin/movies")
       .then((r) => r.json())
-      .then(setMovies);
-  }, []);
+      .then((data: Movie[]) => {
+        setMovies(data);
+        if (jumpToMovieId) {
+          const target = data.find((m) => m.id === jumpToMovieId);
+          if (target) selectMovie(target);
+          onJumpHandled();
+        }
+      });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function letterboxdSlug(title: string): string {
     return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -385,31 +491,39 @@ function ReviewsTab() {
   return (
     <div className="flex gap-8">
       {/* movie list */}
-      <div className="w-48 shrink-0">
+      <div className="w-52 shrink-0">
         <div className="text-[10px] uppercase tracking-[0.15em] text-lbx-body mb-3">
-          select movie
+          editable ({movies.filter((m) => !m.played).length})
         </div>
         <div className="flex flex-col">
-          {movies.map((m) => (
-            <button
-              key={m.id}
-              onClick={() => selectMovie(m)}
-              className={`text-left px-2 py-1.5 text-sm transition-colors border-l-2 ${
-                selectedMovie?.id === m.id
-                  ? "border-l-lbx-green text-foreground"
-                  : "border-l-transparent text-lbx-muted hover:text-foreground"
-              }`}
-            >
-              {m.title}
-              {m.year && (
-                <span className="text-lbx-body text-[11px] ml-1">
-                  {m.year}
+          {movies
+            .filter((m) => !m.played)
+            .sort((a, b) => a.review_count - b.review_count)
+            .map((m) => (
+              <button
+                key={m.id}
+                onClick={() => selectMovie(m)}
+                className={`text-left px-2 py-1.5 text-sm transition-colors border-l-2 flex items-center justify-between ${
+                  selectedMovie?.id === m.id
+                    ? "border-l-lbx-green text-foreground"
+                    : "border-l-transparent text-lbx-muted hover:text-foreground"
+                }`}
+              >
+                <span>
+                  {m.title}
+                  {m.year && (
+                    <span className="text-lbx-body text-[11px] ml-1">{m.year}</span>
+                  )}
                 </span>
-              )}
-            </button>
-          ))}
-          {movies.length === 0 && (
-            <div className="text-xs text-lbx-body">add movies first</div>
+                <span className={`text-[10px] ${
+                  m.review_count >= 5 ? "text-lbx-green" : m.review_count > 0 ? "text-lbx-orange" : "text-lbx-body/40"
+                }`}>
+                  {m.review_count}/5
+                </span>
+              </button>
+            ))}
+          {movies.filter((m) => !m.played).length === 0 && (
+            <div className="text-xs text-lbx-body">no editable movies</div>
           )}
         </div>
       </div>
@@ -596,17 +710,45 @@ function ReviewsTab() {
                     </div>
                   </div>
                   {isEditing ? (
-                    <textarea
-                      value={review.review_text}
-                      onChange={(e) => updateReview(i, "review_text", e.target.value)}
-                      placeholder="review text"
-                      rows={2}
-                      className="w-full bg-transparent border border-lbx-border px-3 py-2 text-sm text-lbx-muted font-serif leading-relaxed placeholder-lbx-body/40 outline-none focus:border-lbx-green resize-none"
-                    />
+                    <div>
+                      <div className="flex gap-1 mb-1">
+                        <button
+                          onMouseDown={(e) => { e.preventDefault(); document.execCommand("bold"); }}
+                          className="text-[10px] font-bold text-lbx-body hover:text-foreground px-1.5 py-0.5 border border-lbx-border hover:border-lbx-muted transition-colors"
+                        >
+                          B
+                        </button>
+                        <button
+                          onMouseDown={(e) => { e.preventDefault(); document.execCommand("italic"); }}
+                          className="text-[10px] italic text-lbx-body hover:text-foreground px-1.5 py-0.5 border border-lbx-border hover:border-lbx-muted transition-colors"
+                        >
+                          I
+                        </button>
+                      </div>
+                      <div
+                        contentEditable
+                        suppressContentEditableWarning
+                        onBlur={(e) => updateReview(i, "review_text", e.currentTarget.innerHTML)}
+                        onPaste={(e) => {
+                          e.preventDefault();
+                          const html = e.clipboardData.getData("text/html");
+                          const text = e.clipboardData.getData("text/plain");
+                          if (html) {
+                            const clean = html.replace(/<(?!\/?(?:em|i|b|strong|br)\b)[^>]+>/gi, "");
+                            document.execCommand("insertHTML", false, clean);
+                          } else {
+                            document.execCommand("insertText", false, text);
+                          }
+                        }}
+                        dangerouslySetInnerHTML={{ __html: review.review_text }}
+                        className="w-full bg-transparent border border-lbx-border px-3 py-2 text-sm text-lbx-muted font-serif leading-relaxed outline-none focus:border-lbx-green min-h-[3em] [&:empty]:before:content-['review_text'] [&:empty]:before:text-lbx-body/40"
+                      />
+                    </div>
                   ) : (
-                    <p className="text-sm text-lbx-muted font-serif leading-relaxed">
-                      {review.review_text || <span className="text-lbx-body/40 italic">no text — click edit</span>}
-                    </p>
+                    <div
+                      className="text-sm text-lbx-muted font-serif leading-relaxed [&_em]:italic [&_i]:italic [&_b]:font-bold [&_strong]:font-bold"
+                      dangerouslySetInnerHTML={{ __html: review.review_text || '<span class="opacity-40 italic">no text — click edit</span>' }}
+                    />
                   )}
                 </div>
               );
@@ -704,8 +846,8 @@ function ScheduleTab() {
               onChange={(e) => setSelectedMovieId(e.target.value)}
               className="w-full bg-lbx-surface border border-lbx-border px-3 py-2 text-sm text-foreground outline-none focus:border-lbx-green"
             >
-              <option value="">select</option>
-              {movies.map((m) => (
+              <option value="">select — {movies.filter((m) => m.review_count >= 5 && !m.schedule).length} ready</option>
+              {movies.filter((m) => m.review_count >= 5 && !m.schedule).map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.title} ({m.year})
                 </option>

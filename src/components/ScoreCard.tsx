@@ -16,6 +16,7 @@ interface ScoreCardProps {
     poster_url: string | null;
     director: string | null;
     genres: string[] | null;
+    letterboxd_url: string | null;
   } | null;
 }
 
@@ -116,6 +117,16 @@ export default function ScoreCard({
                     <div className="mt-1 text-[10px] text-lbx-muted">
                       {answer.genres.join(" / ")}
                     </div>
+                  )}
+                  {answer.letterboxd_url && (
+                    <a
+                      href={answer.letterboxd_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1.5 text-[10px] text-lbx-blue hover:text-lbx-green transition-colors inline-block"
+                    >
+                      view on letterboxd &rarr;
+                    </a>
                   )}
                 </div>
 
