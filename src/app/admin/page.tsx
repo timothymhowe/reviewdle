@@ -661,8 +661,16 @@ function ReviewsTab({ jumpToMovieId, onJumpHandled }: { jumpToMovieId: string | 
                         type="text"
                         value={review.review_date}
                         onChange={(e) => updateReview(i, "review_date", e.target.value)}
-                        placeholder="date"
-                        className="w-24 bg-transparent text-[10px] text-lbx-body outline-none border-b border-lbx-border focus:border-lbx-green"
+                        onBlur={(e) => {
+                          const v = e.target.value.trim();
+                          if (v && !/^\d{1,2} (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}$/i.test(v)) {
+                            e.target.classList.add("border-red-500");
+                          } else {
+                            e.target.classList.remove("border-red-500");
+                          }
+                        }}
+                        placeholder="dd Mon yyyy"
+                        className="w-28 bg-transparent text-[10px] text-lbx-body outline-none border-b border-lbx-border focus:border-lbx-green"
                       />
                     ) : (
                       review.review_date && (

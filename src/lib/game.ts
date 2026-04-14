@@ -1,20 +1,18 @@
 import type { GameState, Guess, GameStatus } from "@/types";
 
-const STORAGE_KEY = "reviewdle-state";
+const STORAGE_PREFIX = "reviewdle-state-";
 const STREAK_KEY = "reviewdle-streak";
 
 export function getTodayDateString(): string {
   return new Date().toISOString().split("T")[0];
 }
 
-export function loadGameState(): GameState | null {
+export function loadGameState(puzzleId: string): GameState | null {
   if (typeof window === "undefined") return null;
-  const raw = localStorage.getItem(STORAGE_KEY);
+  const raw = localStorage.getItem(STORAGE_PREFIX + puzzleId);
   if (!raw) return null;
   try {
-    const state: GameState = JSON.parse(raw);
-    if (state.date !== getTodayDateString()) return null;
-    return state;
+    return JSON.parse(raw);
   } catch {
     return null;
   }
@@ -22,7 +20,7 @@ export function loadGameState(): GameState | null {
 
 export function saveGameState(state: GameState): void {
   if (typeof window === "undefined") return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  localStorage.setItem(STORAGE_PREFIX + state.puzzleId, JSON.stringify(state));
 }
 
 export function createInitialState(

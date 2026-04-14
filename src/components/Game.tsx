@@ -50,8 +50,8 @@ export default function Game({ puzzleNumber }: GameProps) {
         const data = await res.json();
         setPuzzle(data);
 
-        const saved = loadGameState();
-        if (saved && saved.puzzleId === data.puzzleId) {
+        const saved = loadGameState(data.puzzleId);
+        if (saved) {
           setGameState(saved);
           if (saved.status !== "playing") {
             const lastGuess = saved.guesses[saved.guesses.length - 1];

@@ -164,7 +164,7 @@ export default function ScoreCard({
             <img
               src={`https://image.tmdb.org/t/p/w200${answer.poster_url}`}
               alt={answer.title}
-              className="w-16 shrink-0 self-start"
+              className="w-16 max-h-24 object-contain shrink-0 self-start"
             />
           )}
           <div className="flex-1 min-w-0 py-2">

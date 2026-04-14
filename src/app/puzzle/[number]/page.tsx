@@ -21,7 +21,7 @@ export default async function PuzzlePage({
   return (
     <div className="flex flex-col flex-1 items-center font-sans">
       <header className="w-full border-b border-lbx-border">
-        <div className="max-w-xl mx-auto px-5 py-4 flex items-baseline justify-between">
+        <div className="max-w-xl mx-auto px-5 py-4 flex items-center justify-between">
           <a href="/" className="text-2xl font-bold tracking-tight text-white lowercase font-sans flex items-center gap-2 no-underline">
             <svg width="56" height="28" viewBox="0 0 44 22" className="shrink-0">
               <defs>
@@ -40,7 +40,12 @@ export default async function PuzzlePage({
             </svg>
             reviewdle
           </a>
-          <HowToPlayButton />
+          <div className="flex items-center gap-3">
+            <a href="/archive" className="px-2.5 py-1 bg-lbx-surface border border-lbx-border text-lbx-muted hover:text-foreground hover:border-lbx-muted hover:bg-lbx-surface-light transition-colors text-[10px] uppercase tracking-wider font-semibold no-underline">
+              archive
+            </a>
+            <HowToPlayButton />
+          </div>
         </div>
       </header>
       <main className="flex-1 w-full max-w-xl mx-auto px-5 py-6">
