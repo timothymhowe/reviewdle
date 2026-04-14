@@ -39,6 +39,7 @@ export async function GET(request: NextRequest) {
     cast,
     genres: movie.genres?.map((g: { name: string }) => g.name) || [],
     runtime_minutes: movie.runtime,
+    studio: movie.production_companies?.[0]?.name || null,
     tagline: movie.tagline || null,
     overview: movie.overview || null,
     imdb_id: movie.imdb_id || null,

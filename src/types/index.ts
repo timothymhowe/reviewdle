@@ -25,6 +25,7 @@ export interface Movie {
   cast_members: string[] | null;
   genres: string[] | null;
   runtime_minutes: number | null;
+  studio: string | null;
   tagline: string | null;
   overview: string | null;
   imdb_id: string | null;

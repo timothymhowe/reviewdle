@@ -34,6 +34,7 @@ create table movies (
   cast_members text[],
   genres text[],
   runtime_minutes integer,
+  studio text,
   tagline text,
   overview text,
   imdb_id text,

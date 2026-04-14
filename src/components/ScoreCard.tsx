@@ -162,9 +162,9 @@ export default function ScoreCard({
         <div className="flex items-stretch gap-2.5">
           {answer.poster_url && (
             <img
-              src={`https://image.tmdb.org/t/p/w92${answer.poster_url}`}
+              src={`https://image.tmdb.org/t/p/w200${answer.poster_url}`}
               alt={answer.title}
-              className="w-12 object-cover shrink-0"
+              className="w-10 object-cover shrink-0"
             />
           )}
           <div className="flex-1 min-w-0 py-2">
