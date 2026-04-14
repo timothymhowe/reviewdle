@@ -25,6 +25,12 @@ export async function GET(
     return NextResponse.json({ error: "puzzle not found" }, { status: 404 });
   }
 
+  // don't serve future puzzles
+  const today = new Date().toISOString().split("T")[0];
+  if (data.puzzleDate > today) {
+    return NextResponse.json({ error: "puzzle not found" }, { status: 404 });
+  }
+
   const total = await getTotalPuzzleCount();
 
   const puzzle: DailyResponse & { totalPuzzles: number } = {

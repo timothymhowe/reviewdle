@@ -37,6 +37,17 @@ export default async function PuzzlePage({
       <main className="flex-1 w-full max-w-xl mx-auto px-5 py-6">
         <Game puzzleNumber={puzzleNumber} />
       </main>
+      <footer className="w-full border-t border-lbx-border py-4">
+        <div className="max-w-xl mx-auto px-5 text-[9px] text-lbx-body/60 leading-relaxed text-center">
+          <p>
+            reviewdle is not affiliated with, endorsed by, or associated with letterboxd ltd. all user reviews displayed on this site are sourced from{" "}
+            <a href="https://letterboxd.com" target="_blank" rel="noopener noreferrer" className="text-lbx-body hover:text-lbx-green transition-colors">letterboxd.com</a>
+            {" "}and remain the property of their respective authors. movie data provided by{" "}
+            <a href="https://www.themoviedb.org" target="_blank" rel="noopener noreferrer" className="text-lbx-body hover:text-lbx-green transition-colors">tmdb</a>.
+          </p>
+          <p className="mt-1.5">&copy; 2026 ailette, llc</p>
+        </div>
+      </footer>
     </div>
   );
 }

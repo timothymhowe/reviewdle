@@ -42,9 +42,9 @@ export default function ReviewCard({ review, reviewNumber, isLatest, unseen }: R
               </svg>
             )}
             <span className="text-lbx-body">watched by</span>
-            {review.reviewer_profile_url ? (
+            {review.letterboxd_url ? (
               <a
-                href={review.reviewer_profile_url}
+                href={review.letterboxd_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-semibold text-foreground hover:text-lbx-green transition-colors"
