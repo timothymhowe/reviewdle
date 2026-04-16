@@ -74,7 +74,7 @@ export function HowToPlayButton() {
                 </div>
 
                 <div className="text-[10px] text-lbx-body">
-                  a new puzzle every day &middot; browse past puzzles with the arrows
+                  a new puzzle every day at midnight et &middot; browse past puzzles with the arrows
                 </div>
 
                 <button

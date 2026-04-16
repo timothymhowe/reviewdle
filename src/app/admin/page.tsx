@@ -805,9 +805,9 @@ function ScheduleTab() {
         const lastDate = data[data.length - 1].puzzle_date;
         const next = new Date(lastDate);
         next.setDate(next.getDate() + 1);
-        setPuzzleDate(next.toISOString().split("T")[0]);
+        setPuzzleDate(next.toLocaleDateString("en-CA", { timeZone: "America/New_York" }));
       } else {
-        setPuzzleDate(new Date().toISOString().split("T")[0]);
+        setPuzzleDate(new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" }));
       }
     }
   }

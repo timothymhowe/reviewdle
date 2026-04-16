@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { getTodayET } from "./date";
 
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -6,7 +7,7 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 export const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export async function getTodaysPuzzle() {
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTodayET();
 
   const { data: puzzle, error } = await supabase
     .from("daily_puzzles")
@@ -121,7 +122,7 @@ export async function getPuzzleByNumber(puzzleNumber: number) {
 }
 
 export async function getLatestPuzzleNumber() {
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTodayET();
   const { data } = await supabase
     .from("daily_puzzles")
     .select("puzzle_number")
@@ -134,7 +135,7 @@ export async function getLatestPuzzleNumber() {
 }
 
 export async function getTotalPuzzleCount() {
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTodayET();
   const { count } = await supabase
     .from("daily_puzzles")
     .select("id", { count: "exact", head: true })

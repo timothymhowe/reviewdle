@@ -4,7 +4,9 @@ const STORAGE_PREFIX = "reviewdle-state-";
 const STREAK_KEY = "reviewdle-streak";
 
 export function getTodayDateString(): string {
-  return new Date().toISOString().split("T")[0];
+  return new Date().toLocaleDateString("en-CA", {
+    timeZone: "America/New_York",
+  });
 }
 
 export function loadGameState(puzzleId: string): GameState | null {
@@ -113,7 +115,7 @@ export function updateStreak(won: boolean): { current: number; max: number } {
   if (won) {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toISOString().split("T")[0];
+    const yesterdayStr = yesterday.toLocaleDateString("en-CA", { timeZone: "America/New_York" });
 
     const newCurrent = streak.lastDate === yesterdayStr ? streak.current + 1 : 1;
     const newMax = Math.max(newCurrent, streak.max);

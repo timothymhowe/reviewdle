@@ -50,7 +50,7 @@ export default function ArchivePage() {
     setCompletedMap(map);
   }, []);
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
 
   // build calendar grid for current month
   const firstDay = new Date(year, month, 1).getDay();

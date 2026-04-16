@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { getTodayET } from "@/lib/date";
 
 export async function GET() {
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTodayET();
 
   const { data, error } = await supabase
     .from("daily_puzzles")

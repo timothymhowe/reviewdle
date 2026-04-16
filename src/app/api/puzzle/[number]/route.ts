@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPuzzleByNumber, getTotalPuzzleCount } from "@/lib/supabase";
 import { TEST_PUZZLE } from "@/lib/test-data";
+import { getTodayET } from "@/lib/date";
 import type { DailyResponse } from "@/types";
 
 const useSupabase = process.env.SUPABASE_URL !== "your_supabase_url";
@@ -26,7 +27,7 @@ export async function GET(
   }
 
   // don't serve future puzzles
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTodayET();
   if (data.puzzleDate > today) {
     return NextResponse.json({ error: "puzzle not found" }, { status: 404 });
   }

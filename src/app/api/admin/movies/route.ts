@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { getTodayET } from "@/lib/date";
 
 // GET all movies with review count and schedule info
 export async function GET() {
@@ -34,7 +35,7 @@ export async function GET() {
     };
   }
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTodayET();
 
   const enriched = (movies || []).map((m) => ({
     ...m,
