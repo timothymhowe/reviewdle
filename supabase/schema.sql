@@ -2,12 +2,21 @@
 -- cinedle database schema
 -- ===========================================
 
+-- roles
+create table roles (
+  id integer primary key,
+  name text unique not null
+);
+
+insert into roles (id, name) values (0, 'user'), (1, 'admin');
+
 -- users (optional auth — anonymous users get a cookie-based id)
 create table users (
   id uuid primary key default gen_random_uuid(),
   display_name text,
   email text unique,
   avatar_url text,
+  role_id integer not null default 0 references roles(id),
   is_anonymous boolean default true,
   cookie_id text unique,
   current_streak integer default 0,
