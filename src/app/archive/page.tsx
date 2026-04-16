@@ -106,7 +106,13 @@ export default function ArchivePage() {
                 if (month === 0) { setMonth(11); setYear(year - 1); }
                 else setMonth(month - 1);
               }}
-              className="text-lbx-body hover:text-foreground transition-colors text-xs"
+              disabled={puzzles.length > 0 && (() => {
+                const earliest = puzzles[puzzles.length - 1]?.puzzle_date;
+                if (!earliest) return false;
+                const [ey, em] = earliest.split("-").map(Number);
+                return year === ey && month <= em - 1;
+              })()}
+              className="text-lbx-body hover:text-foreground transition-colors text-xs disabled:opacity-20"
             >
               &lsaquo;
             </button>
