@@ -4,6 +4,17 @@ import { useState, useEffect } from "react";
 
 const STORAGE_KEY = "reviewdle-seen-how-to-play";
 
+function UTCOffset() {
+  // compute ET offset accounting for DST
+  const now = new Date();
+  const utc = new Date(now.toLocaleString("en-US", { timeZone: "UTC" }));
+  const et = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
+  const offset = (et.getTime() - utc.getTime()) / 3600000;
+  return (
+    <p>new puzzle every day at <span className="text-foreground">midnight et</span> <span className="text-lbx-body/40">(utc{offset >= 0 ? "+" : ""}{offset})</span></p>
+  );
+}
+
 export function HowToPlayButton() {
   const [open, setOpen] = useState(false);
 
@@ -71,10 +82,10 @@ export function HowToPlayButton() {
                       </div>
                     </div>
                   </div>
-                </div>
-
-                <div className="text-[10px] text-lbx-body">
-                  a new puzzle every day at midnight et &middot; browse past puzzles with the arrows
+                  <div className="flex gap-3 items-start">
+                    <span className="text-lbx-green font-mono text-[10px] mt-0.5 shrink-0">04</span>
+                    <UTCOffset />
+                  </div>
                 </div>
 
                 <button
