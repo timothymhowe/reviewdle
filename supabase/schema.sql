@@ -8,7 +8,7 @@ create table roles (
   name text unique not null
 );
 
-insert into roles (id, name) values (0, 'user'), (1, 'admin');
+insert into roles (id, name) values (0, 'user'), (1, 'admin'), (2, 'writer');
 
 -- users (optional auth — anonymous users get a cookie-based id)
 create table users (

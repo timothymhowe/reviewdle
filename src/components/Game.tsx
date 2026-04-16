@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import type { DailyResponse, Guess, GuessResponse, ReviewClue } from "@/types";
+import { supabaseBrowser } from "@/lib/supabase-browser";
 import PuzzleNav from "./PuzzleNav";
 import {
   loadGameState,
@@ -107,6 +108,28 @@ export default function Game({ puzzleNumber }: GameProps) {
         if (data.answer) {
           setAnswer(data.answer);
           setFreshResult(true);
+        }
+
+        // save to supabase if signed in
+        if (newState.status === "won" || newState.status === "lost") {
+          supabaseBrowser.auth.getSession().then(({ data: { session } }) => {
+            if (session?.access_token) {
+              fetch("/api/auth/sync", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${session.access_token}`,
+                },
+                body: JSON.stringify({
+                  gameStates: [{
+                    puzzleId: puzzle.puzzleId,
+                    guesses: newState.guesses,
+                    status: newState.status,
+                  }],
+                }),
+              });
+            }
+          });
         }
 
         if (!data.correct && newState.status === "playing") {

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { supabaseBrowser } from "@/lib/supabase-browser";
 import type { TMDBSearchResult } from "@/types";
 
 interface Movie {
@@ -39,8 +41,40 @@ interface Puzzle {
 }
 
 export default function AdminPage() {
+  const router = useRouter();
   const [tab, setTab] = useState<"movies" | "reviews" | "schedule">("movies");
   const [jumpToMovieId, setJumpToMovieId] = useState<string | null>(null);
+  const [authorized, setAuthorized] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    async function checkAuth() {
+      const { data: { session } } = await supabaseBrowser.auth.getSession();
+      if (!session) { router.push("/"); return; }
+
+      const res = await fetch("/api/auth/me", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      const { user } = await res.json();
+      if (user?.role === "admin") {
+        setAuthorized(true);
+      } else {
+        router.push("/");
+      }
+      setChecking(false);
+    }
+    checkAuth();
+  }, [router]);
+
+  if (checking) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-lbx-body text-xs animate-pulse">checking access</div>
+      </div>
+    );
+  }
+
+  if (!authorized) return null;
 
   function goToReview(movieId: string) {
     setJumpToMovieId(movieId);

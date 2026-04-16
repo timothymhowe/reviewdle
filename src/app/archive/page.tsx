@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { HowToPlayButton } from "@/components/HowToPlay";
+import AuthButton from "@/components/AuthButton";
 import { getScoreLabel } from "@/lib/game";
+import { supabaseBrowser } from "@/lib/supabase-browser";
 
 interface ArchivePuzzle {
   id: string;
@@ -37,6 +39,7 @@ export default function ArchivePage() {
         setLoading(false);
       });
 
+    // load from localStorage first
     const map: Record<string, GameState> = {};
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
@@ -48,6 +51,27 @@ export default function ArchivePage() {
       }
     }
     setCompletedMap(map);
+
+    // if signed in, overlay with server-side results
+    supabaseBrowser.auth.getSession().then(({ data: { session } }) => {
+      if (session?.access_token) {
+        fetch("/api/auth/results", {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+        })
+          .then((r) => r.json())
+          .then(({ results }) => {
+            const merged = { ...map };
+            for (const r of results || []) {
+              merged[r.puzzle_id] = {
+                puzzleId: r.puzzle_id,
+                status: r.won ? "won" : "lost",
+                guesses: r.guesses,
+              };
+            }
+            setCompletedMap(merged);
+          });
+      }
+    });
   }, []);
 
   const today = new Date().toISOString().split("T")[0];

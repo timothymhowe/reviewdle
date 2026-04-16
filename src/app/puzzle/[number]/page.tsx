@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Game from "@/components/Game";
 import PuzzleNav from "@/components/PuzzleNav";
 import { HowToPlayButton } from "@/components/HowToPlay";
+import AuthButton from "@/components/AuthButton";
 import { getLatestPuzzleNumber } from "@/lib/supabase";
 
 export default async function PuzzlePage({
@@ -47,6 +48,7 @@ export default async function PuzzlePage({
               archive
             </a>
             <HowToPlayButton />
+            <AuthButton />
           </div>
         </div>
       </header>

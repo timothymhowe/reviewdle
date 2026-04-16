@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import Game from "@/components/Game";
 import { HowToPlayButton } from "@/components/HowToPlay";
+import AuthButton from "@/components/AuthButton";
 import { getLatestPuzzleNumber } from "@/lib/supabase";
 
 export default async function Home() {
@@ -35,6 +36,7 @@ export default async function Home() {
               archive
             </a>
             <HowToPlayButton />
+            <AuthButton />
           </div>
         </div>
       </header>
