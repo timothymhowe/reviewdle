@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Game from "@/components/Game";
 import { HowToPlayButton } from "@/components/HowToPlay";
 import { getLatestPuzzleNumber } from "@/lib/supabase";

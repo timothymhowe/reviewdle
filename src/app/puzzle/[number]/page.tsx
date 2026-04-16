@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { redirect } from "next/navigation";
 import Game from "@/components/Game";
 import PuzzleNav from "@/components/PuzzleNav";
