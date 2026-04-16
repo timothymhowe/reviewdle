@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { HowToPlayButton } from "@/components/HowToPlay";
-import { getScoreLabel } from "@/lib/game";
+import { getScoreLabel, loadStreak } from "@/lib/game";
 
 interface ArchivePuzzle {
   id: string;
@@ -26,6 +26,7 @@ export default function ArchivePage() {
   const [puzzles, setPuzzles] = useState<ArchivePuzzle[]>([]);
   const [loading, setLoading] = useState(true);
   const [completedMap, setCompletedMap] = useState<Record<string, GameState>>({});
+  const [streak, setStreak] = useState({ current: 0, max: 0 });
   const [year, setYear] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(new Date().getMonth());
 
@@ -48,6 +49,7 @@ export default function ArchivePage() {
       }
     }
     setCompletedMap(map);
+    setStreak(loadStreak());
   }, []);
 
   const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
@@ -143,6 +145,18 @@ export default function ArchivePage() {
           )}
         </div>
 
+        {/* streak */}
+        <div className="flex items-center gap-6 mb-5 text-[11px]">
+          <div className="flex items-center gap-1.5">
+            <span className="text-lbx-body">streak</span>
+            <span className="text-lbx-green font-semibold">{streak.current}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-lbx-body">best</span>
+            <span className="text-foreground font-semibold">{streak.max}</span>
+          </div>
+        </div>
+
         {loading ? (
           <div className="text-xs text-lbx-body animate-pulse">loading</div>
         ) : (
@@ -189,20 +203,31 @@ export default function ArchivePage() {
 
                 const par = puzzle.movie?.par || 3;
                 const scoreLabel = won ? getScoreLabel(state!.guesses.length, par) : null;
+                const diff = won ? state!.guesses.length - par : 0;
+
+                // color: green (under par) → muted (par) → orange (over par) → red (missed)
+                let cellStyle = "border-lbx-border text-lbx-muted hover:border-lbx-muted hover:text-foreground";
+                if (isToday && !won && !lost) {
+                  cellStyle = "border-lbx-green text-lbx-green";
+                } else if (lost) {
+                  cellStyle = "border-red-500/30 bg-red-500/10 text-red-400";
+                } else if (won && diff <= -2) {
+                  cellStyle = "border-lbx-green/50 bg-lbx-green/20 text-lbx-green";
+                } else if (won && diff === -1) {
+                  cellStyle = "border-lbx-green/30 bg-lbx-green/10 text-lbx-green";
+                } else if (won && diff === 0) {
+                  cellStyle = "border-yellow-500/30 bg-yellow-500/10 text-yellow-400";
+                } else if (won && diff === 1) {
+                  cellStyle = "border-lbx-orange/30 bg-lbx-orange/10 text-lbx-orange";
+                } else if (won && diff >= 2) {
+                  cellStyle = "border-lbx-orange/50 bg-lbx-orange/20 text-lbx-orange";
+                }
 
                 return (
                   <button
                     key={day}
                     onClick={() => router.push(isToday ? "/" : `/puzzle/${puzzle.puzzle_number}`)}
-                    className={`aspect-square flex flex-col items-center justify-center gap-0.5 transition-colors border rounded-sm ${
-                      won
-                        ? "border-lbx-green/30 bg-lbx-green/10 text-lbx-green"
-                        : lost
-                          ? "border-lbx-orange/30 bg-lbx-orange/10 text-lbx-orange"
-                          : isToday
-                            ? "border-lbx-green text-lbx-green"
-                            : "border-lbx-border text-lbx-muted hover:border-lbx-muted hover:text-foreground"
-                    }`}
+                    className={`aspect-square flex flex-col items-center justify-center gap-0.5 transition-colors border rounded-sm ${cellStyle}`}
                   >
                     <span className="font-mono font-semibold text-[11px]">{puzzle.puzzle_number}</span>
                     {won && scoreLabel && (
@@ -217,13 +242,21 @@ export default function ArchivePage() {
             </div>
 
             {/* legend */}
-            <div className="flex items-center gap-4 mt-4 text-[9px] text-lbx-body/60">
+            <div className="flex items-center gap-3 mt-4 text-[9px] text-lbx-body/60">
               <div className="flex items-center gap-1">
-                <div className="w-2.5 h-2.5 border border-lbx-green/30 bg-lbx-green/10" />
-                <span>won</span>
+                <div className="w-2.5 h-2.5 border border-lbx-green/50 bg-lbx-green/20" />
+                <span>under par</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-2.5 h-2.5 border border-yellow-500/30 bg-yellow-500/10" />
+                <span>par</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-2.5 h-2.5 border border-lbx-orange/30 bg-lbx-orange/10" />
+                <span>over par</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-2.5 h-2.5 border border-red-500/30 bg-red-500/10" />
                 <span>missed</span>
               </div>
               <div className="flex items-center gap-1">
